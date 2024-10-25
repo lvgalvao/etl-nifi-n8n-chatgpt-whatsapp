@@ -6,37 +6,55 @@ Uma capacitação completa de 9 horas, ao vivo, onde você aprenderá a criar um
 ## Parte da Jornada de Dados
 Este workshop faz parte da **Jornada de Dados**. Para mais informações, acesse [Jornada de Dados](https://github.com/lvgalvao/data-engineering-roadmap).
 
-## Estrutura do Workshop
-### Horário do Workshop
-Das 9h às 18h no dia 26/10
-
 ### Agenda do Workshop
-- **9h**: Boas-vindas e visão de mercado, desafios de extrair e integrar sistemas
-- **10h**: Overview do que vamos construir à tarde
-- **10h30**: Planejamento da ETL e crescimento em Python
-- **11h30 até 13h**: Apache NiFi
-- **13h até 14h**: Almoço
-- **14h**: Setup (via SSH) (1HR)
-  - Setup VM Ubuntu 22 + Docker
-  - Instalação do N8N + Volume Persistente
-  - Instalação de SSL
-  - Teste de Workflow
-  - Boas práticas de escalabilidade
-- **15h**: Apresentando o N8N (as Boas) (1HR)
-  - Gestão de usuários
-  - Gestão de Credenciais
-  - Explorando 1000+ conectores
-  - Conhecendo o poderoso sistema de Logs
-- **16h**: Desafio (2HR)
-  - “Criar um robô que coleta o preço do Bitcoin e alerta no WhatsApp/Telegram se houve um recorde de máxima ou mínima da semana”
-  - Criar Workflow
-  - Preparar API (Realizar teste Postman/Python)
-  - Obter informações do preço do Bitcoin 
-  - Obter informações da max/min registradas no banco (só relevar 7 dias)
-  - Comparar preço atual com records e decidir se alerta ou não
-  - Configurar bot Telegram e WhatsApp 
-  - Teste final
-  - Commit GIT
+
+- **9h**: **Boas-vindas e Visão de Mercado**
+  - Apresentação Jornada de Dados
+  - Apresentação do que será desenvolvido na jornada.
+  - Introdução aos desafios de extrair e integrar dados de diferentes sistemas.
+  - Principais tendências e oportunidades na automação de dados. 
+
+- **10h**: **Overview do Workshop**
+  - Apresentação do projeto que será construído na tarde.
+  - Alinhamento de expectativas e objetivos práticos.
+
+- **10h30**: **Planejamento da ETL**
+  - Como planejar uma ETL?
+  - Como avaliar os requisitos de integração e extração?
+  - Estruturando a arquitetura do processo ETL a ser desenvolvido.
+  - Fazendo nosso primeiro aquecimento em Python.
+
+- **11h30 até 13h**: **Apache NiFi**
+  - Overview do NiFi
+  - Implementação de fluxos de dados no NiFi.
+  - Salvando nosso código e o desafio da sustentação
+
+- **13h até 14h**: **Intervalo para Almoço**
+
+- **14h**: **Setup de Ambiente (1h)**
+  - Conectando via SSH e configurando VM Ubuntu 22 + Docker.
+  - Instalação do N8N com volume persistente.
+  - Configuração de SSL e segurança básica.
+  - Teste de workflow e boas práticas para escalabilidade.
+
+- **15h**: **Explorando o N8N (1h)**
+  - Gestão eficiente de usuários e credenciais.
+  - Exploração dos 1000+ conectores disponíveis.
+  - Utilização e monitoramento do sistema de logs.
+
+- **16h**: **Desafio Prático (2h)**
+  - **Objetivo:** Criar um robô para monitorar o preço do Bitcoin e enviar alertas no WhatsApp/Telegram.
+    - **Etapas:**
+      1. Construção do Workflow no N8N.
+      2. Preparação da API e testes no Postman/Python.
+      3. Obtenção do preço atual do Bitcoin.
+      4. Recuperação das máximas e mínimas dos últimos 7 dias no banco de dados.
+      5. Comparação do preço atual com os registros históricos.
+      6. Configuração e integração do bot no Telegram e WhatsApp.
+      7. Realização de testes finais e validação do processo.
+      8. Commit no Git para versionamento.
+
+- **17h00**: **Sorteio e dúvidas**
 
 ### Sobre o Evento
 O foco será a **engenharia de dados aplicada à integração de múltiplas fontes**, demonstrando como automatizar processos e lidar com grandes volumes de dados. Durante o workshop, você vai:
