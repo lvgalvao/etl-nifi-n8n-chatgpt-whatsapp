@@ -10,9 +10,36 @@ Este workshop faz parte da **Jornada de Dados**. Para mais informações, acesse
 ### Horário do Workshop
 Das 9h às 18h no dia 26/10
 
+### Agenda do Workshop
+- **9h**: Boas-vindas e visão de mercado, desafios de extrair e integrar sistemas
+- **10h**: Overview do que vamos construir à tarde
+- **10h30**: Planejamento da ETL e crescimento em Python
+- **11h30 até 13h**: Apache NiFi
+- **13h até 14h**: Almoço
+- **14h**: Setup (via SSH) (1HR)
+  - Setup VM Ubuntu 22 + Docker
+  - Instalação do N8N + Volume Persistente
+  - Instalação de SSL
+  - Teste de Workflow
+  - Boas práticas de escalabilidade
+- **15h**: Apresentando o N8N (as Boas) (1HR)
+  - Gestão de usuários
+  - Gestão de Credenciais
+  - Explorando 1000+ conectores
+  - Conhecendo o poderoso sistema de Logs
+- **16h**: Desafio (2HR)
+  - “Criar um robô que coleta o preço do Bitcoin e alerta no WhatsApp/Telegram se houve um recorde de máxima ou mínima da semana”
+  - Criar Workflow
+  - Preparar API (Realizar teste Postman/Python)
+  - Obter informações do preço do Bitcoin 
+  - Obter informações da max/min registradas no banco (só relevar 7 dias)
+  - Comparar preço atual com records e decidir se alerta ou não
+  - Configurar bot Telegram e WhatsApp 
+  - Teste final
+  - Commit GIT
+
 ### Sobre o Evento
 O foco será a **engenharia de dados aplicada à integração de múltiplas fontes**, demonstrando como automatizar processos e lidar com grandes volumes de dados. Durante o workshop, você vai:
-- **Processar um arquivo de 1 bilhão de linhas**
 - Integrar dados de **APIs, SQL e NoSQL**
 - Construir pipelines de automação com **Python, N8N e ChatGPT**
 - Realizar automações via **WhatsApp**, explorando casos de uso para trading financeiro e análise de mercado.
@@ -69,11 +96,5 @@ src/
   print(get_bitcoin_price())
   ```
 
-### Agenda do Workshop
-- **Introdução**: O que são ETLs e por que são essenciais em projetos de dados  
-- **Extração com Python**: APIs públicas e privadas  
-- **Integrações com Airbyte e Apache NiFi**  
-- **Automação com N8N e WhatsApp API**  
-- **Case Prático**: Processando um arquivo de 1 bilhão de linhas  
-- **Trading Automatizado**: Decisões baseadas em dados em tempo real  
-- **Monitoramento e Escalabilidade**: Como gerenciar pipelines em produção
+### Monitoramento e Escalabilidade
+Como gerenciar pipelines em produção.
