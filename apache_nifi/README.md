@@ -45,20 +45,6 @@ Originalmente criado pela NSA sob o nome Niagarafiles, o NiFi foi liberado como 
 
 ---
 
-## **Quick Start: Como rodar o Apache NiFi**
-
-### **Dockerfile Simplificado**
-```dockerfile
-# Usando a imagem oficial do Apache NiFi
-FROM apache/nifi:latest
-
-# Expondo a porta HTTPS
-EXPOSE 8443
-
-# Comando para iniciar o NiFi
-CMD ["bin/nifi.sh", "run"]
-```
-
 ### **Passo a Passo para Rodar a Instância**
 
 #### **1. Baixe a Imagem Oficial**
@@ -136,137 +122,205 @@ docker run --name nifi -p 8443:8443 -d \
     D --> E
   ```
 
-Este guia irá mostrar como você pode conectar-se a uma **API RESTful** usando o **Apache NiFi** e salvar os dados obtidos em um banco de dados **PostgreSQL**. 
+## **README – Projeto de Enriquecimento de Dados com Apache NiFi**
+
+---
+
+### **Descrição do Projeto**
+Este projeto tem como objetivo criar um **pipeline de enriquecimento de dados** utilizando o Apache NiFi. Ele conecta uma API externa para coletar informações adicionais (como CEPs), processa e armazena os dados enriquecidos em um banco de dados MySQL. A aplicação dos **Controller Services** no NiFi simplifica e otimiza as conexões, leituras e escritas de dados.
 
 ---
 
 ## **Pré-requisitos**
-1. **Instância do Apache NiFi** rodando em [https://localhost:8443/nifi](https://localhost:8443/nifi)  
-2. **Banco de Dados PostgreSQL** ativo com as credenciais e a tabela configuradas.
-3. **JDBC Driver do PostgreSQL** disponível para o NiFi.
+
+1. **Ferramentas necessárias:**
+   - Apache NiFi instalado e configurado ([Documentação NiFi](https://nifi.apache.org/))
+   - Banco de dados **MySQL** em funcionamento
+   - **JDBC Driver** do MySQL instalado
+   - API pública ou privada para coleta de dados (por exemplo, API de CEP)
+   - Java JDK 8+ para o funcionamento do NiFi
+
+2. **Credenciais e acessos:**
+   - Usuário e senha do banco de dados MySQL
+   - Acesso à API para coleta de dados
 
 ---
 
-## **Passo 1: Preparar o PostgreSQL**
+## **Passo a Passo do Projeto**
 
-1. **Crie a Tabela no PostgreSQL**:
-   Abaixo está um exemplo de criação de uma tabela chamada `api_data`:
+### **1. Configuração do Banco de Dados MySQL**
+1. Crie um banco de dados no MySQL:
    ```sql
-   CREATE TABLE api_data (
-       id SERIAL PRIMARY KEY,
-       name TEXT,
-       age INTEGER,
-       email TEXT,
-       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   CREATE DATABASE dados_enriquecidos;
+   ```
+2. Crie a tabela para armazenar os dados enriquecidos:
+   ```sql
+   CREATE TABLE dados_cep (
+     id INT AUTO_INCREMENT PRIMARY KEY,
+     nome VARCHAR(255),
+     cep VARCHAR(20),
+     endereco VARCHAR(255),
+     bairro VARCHAR(255),
+     cidade VARCHAR(255),
+     estado VARCHAR(50),
+     atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
    );
    ```
 
-2. **Instale o Driver JDBC do PostgreSQL**:
-   - Baixe o driver PostgreSQL JDBC [aqui](https://jdbc.postgresql.org/download.html).
-   - Adicione o arquivo `.jar` ao diretório `lib` do NiFi:
+---
+
+### **2. Instalação e Configuração do Apache NiFi**
+
+1. **Baixe e instale o Apache NiFi**:
+   - Link: [Apache NiFi Downloads](https://nifi.apache.org/download.html)
+
+2. **Inicie o Apache NiFi:**
+   - No Linux/macOS:
      ```bash
-     cp postgresql-<version>.jar /opt/nifi/nifi-current/lib/
+     ./nifi.sh start
+     ```
+   - No Windows:
+     ```bash
+     nifi.bat start
      ```
 
----
-
-## **Passo 2: Criar o Fluxo no NiFi**
-
-
-1. **Acesse a interface NiFi** em [https://localhost:8443/nifi](https://localhost:8443/nifi).
-
-2. **Adicione e Configure os Componentes**:
-
-### **1. Processador: InvokeHTTP**  
-- **Descrição:** Este processador faz a requisição à API.
-- **Configuração:**
-  - **HTTP Method:** GET
-  - **Remote URL:** A URL da API que deseja consultar (ex: https://api.example.com/users)
-  - **Attributes to Send:** `All Attributes`
-  - **SSL Context Service:** Deixe em branco se a API não exigir HTTPS seguro.
-  - **Response Body:** **flowfile-content**
-
-- **Dica:** Teste a API em alguma ferramenta como Postman para garantir que a URL está correta.
+3. Acesse a interface gráfica do NiFi em `http://localhost:8080/nifi`.
 
 ---
 
-### **2. Processador: SplitJson**  
-- **Descrição:** Divide os dados JSON retornados pela API em itens individuais.
-- **Configuração:**
-  - **JSONPath Expression:** `$.*`
-  - **Destination:** flowfile-content
+### **3. Configuração dos Controller Services**
+
+1. **Abra o menu Global**:
+   - Na interface NiFi, clique em **Configuration** (ícone no canto superior direito).
+
+2. **Adicione e configure os seguintes Controller Services:**
+
+   #### **DBCPConnectionPool**  
+   - **Descrição:** Pool de conexão com o banco MySQL.  
+   **Configurações:**
+     - **Database Connection URL:** `jdbc:mysql://localhost:3306/dados_enriquecidos`
+     - **Database Driver Class Name:** `com.mysql.cj.jdbc.Driver`
+     - **Username:** *seu_usuario_mysql*
+     - **Password:** *sua_senha_mysql*
+     - **Max Total Connections:** 5
+
+   #### **JsonTreeReader**  
+   - **Descrição:** Leitor de dados JSON para processamento.
+
+   #### **JsonRecordSetWriter**  
+   - **Descrição:** Escritor de dados em formato JSON para armazená-los no banco.
+
+3. **Habilite os Controller Services**:
+   - Clique em **Enable** para cada serviço configurado.
 
 ---
 
-### **3. Processador: ConvertRecord** (Opcional)  
-- **Descrição:** Converte o JSON para um formato tabular (como CSV ou Avro).
-- **Configuração:**
-  - **Record Reader:** Use o **JsonTreeReader**.
-  - **Record Writer:** Use um **CSVRecordSetWriter** (ou outro formato suportado).
+### **4. Montagem do Fluxo no Apache NiFi**
+
+1. **Arraste os Processors para a tela:**
+   - **InvokeHTTP:** Faz a chamada para a API de CEP.
+   - **ConvertRecord:** Converte o JSON recebido em um formato processável.
+   - **PutDatabaseRecord:** Insere os dados enriquecidos no MySQL.
+
+2. **Configuração dos Processors:**
+
+   #### **InvokeHTTP**
+   - **Method:** GET
+   - **Remote URL:** *URL da API de CEP*  
+   **Exemplo:** `https://viacep.com.br/ws/01001000/json/`
+   - **Properties:** Configure para coletar CEPs dinamicamente.
+
+   #### **ConvertRecord**
+   - **Record Reader:** `JsonTreeReader`
+   - **Record Writer:** `JsonRecordSetWriter`
+
+   #### **PutDatabaseRecord**
+   - **Database Connection Pooling Service:** Selecione o `DBCPConnectionPool`.
+   - **Table Name:** `dados_cep`
+
+3. **Conecte os Processors:**
+   - Conecte o **InvokeHTTP** ao **ConvertRecord** e, em seguida, ao **PutDatabaseRecord**.
+
+4. **Teste o Fluxo:**  
+   - Clique em **Start** nos Processors para executar o pipeline.
 
 ---
 
-### **4. Processador: PutDatabaseRecord**  
-- **Descrição:** Insere os dados no PostgreSQL.
-- **Configuração:**
-  - **JDBC Connection Pool:** Configure o acesso ao PostgreSQL.
-  - **Record Reader:** Use o mesmo leitor que configurou no `ConvertRecord`.
-  - **Table Name:** `api_data`
-  - **Update Key:** Se necessário, configure uma coluna para updates (ex.: `id`).
+### **5. Teste e Verificação do Pipeline**
+
+1. **Execute uma chamada para a API:**
+   - Verifique se a API retorna o JSON esperado com as informações do CEP.
+
+2. **Verifique a inserção no banco de dados:**
+   - Após a execução do pipeline, rode a seguinte query no MySQL:
+     ```sql
+     SELECT * FROM dados_cep;
+     ```
+   - Verifique se os dados foram inseridos corretamente.
 
 ---
 
-## **Passo 3: Configurar o Conector JDBC no NiFi**
+### **6. Agendamento e Monitoramento do Pipeline**
 
-1. **Adicione um Controller Service**:
-   - Clique no botão de configuração no canto superior direito da interface do NiFi.
-   - Em **Controller Services**, adicione um novo **DBCPConnectionPool**.
+1. **Agendamento do Pipeline:**
+   - No Processor **InvokeHTTP**, configure o **Scheduling** para rodar automaticamente a cada X minutos.
 
-2. **Configure o DBCPConnectionPool**:
-   - **Database Connection URL:** `jdbc:postgresql://<host>:<port>/<database>`  
-     Exemplo: `jdbc:postgresql://localhost:5432/mydatabase`
-   - **Database Driver Class Name:** `org.postgresql.Driver`
-   - **Username:** `seu_usuario`
-   - **Password:** `sua_senha`
-
-3. **Ative o Controller Service** clicando no botão de ativação.
+2. **Monitoramento:**
+   - Use a interface do NiFi para monitorar a execução e logs de erros em tempo real.
 
 ---
 
-## **Passo 4: Conectar os Processadores e Executar o Fluxo**
+### **7. Solução de Problemas Comuns**
 
-1. **Conecte os Processadores** na seguinte ordem:
-   - **InvokeHTTP** → **SplitJson** → **PutDatabaseRecord**
+- **Erro de conexão com MySQL:**
+  - Verifique se o MySQL está rodando e se a **JDBC URL** está correta.
+  - Verifique se o driver MySQL está configurado corretamente no NiFi.
 
-2. **Inicie o Fluxo**:
-   - Clique no botão de play em cada processador ou no fluxo completo para iniciar.
-
----
-
-## **Passo 5: Verificar a Inserção no PostgreSQL**
-
-1. Conecte-se ao PostgreSQL e execute uma consulta SQL para verificar os dados inseridos:
-   ```sql
-   SELECT * FROM api_data;
-   ```
+- **Dados não aparecem no MySQL:**
+  - Verifique se o nome da tabela no **PutDatabaseRecord** corresponde à tabela criada no banco.
 
 ---
 
-## **Dicas Adicionais**
+### **8. Considerações Finais**
 
-- **Logs e Erros:** Verifique os logs do NiFi para encontrar possíveis erros na execução do fluxo.
-- **Transformações:** Use o processador **UpdateRecord** se precisar transformar dados antes de inseri-los no banco.
-- **Agendamento:** Configure o **InvokeHTTP** para rodar em intervalos regulares e buscar dados periodicamente.
+Este pipeline é um exemplo simples de como usar o **Apache NiFi** para enriquecer dados, conectando APIs e bancos de dados em um fluxo contínuo. A modularidade e a facilidade de configuração do NiFi permitem expandir esse projeto para incluir novos endpoints, serviços de validação e relatórios automatizados.
 
 ---
 
-## **Comando Docker Útil para Monitoramento**
+### **9. Possíveis Melhorias**
 
-Se precisar verificar os logs do NiFi:
-```bash
-docker logs nifi | grep ERROR
-```
+- **Adicionar logs detalhados:** Usar Processors como `LogAttribute` para acompanhar os dados em cada etapa.
+- **Incluir mais fontes de dados:** Conectar com outras APIs além da de CEP.
+- **Enviar notificações:** Utilizar serviços como **AWS SNS** ou **Twilio** para enviar alertas em caso de erros.
+- **Implementar cache:** Evitar chamadas repetidas para a mesma API usando bancos NoSQL como Redis.
 
 ---
 
-Com este fluxo configurado, você estará pronto para consultar uma API e salvar os dados no PostgreSQL de forma automatizada com o Apache NiFi.
+### **10. Contato**
+
+Se precisar de suporte ou tiver dúvidas sobre este projeto, entre em contato:
+
+- **Autor:** Luciano Vasconcelos  
+- **Empresa:** Zapflow  
+- **Email:** suporte@suajornadadedados.com.br
+
+---
+
+### **11. Licença**
+
+Este projeto é distribuído sob a licença MIT. Sinta-se à vontade para usar e modificar o código conforme necessário.
+
+---
+
+### **12. Contribuições**
+
+Contribuições são bem-vindas!  
+Para contribuir:
+1. Fork este repositório.
+2. Crie um branch com sua feature: `git checkout -b minha-feature`.
+3. Faça o commit das mudanças: `git commit -m "Minha nova feature"`.
+4. Abra um pull request.
+
+---
+
+Este README oferece um guia completo para a criação e execução do pipeline de enriquecimento de dados com o Apache NiFi.
