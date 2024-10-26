@@ -319,7 +319,7 @@ Agora que os **Controller Services** estão configurados, vamos configurar um pr
 
      - **SQL select query:**  
        ```sql
-       SELECT cep FROM nifi_db.cepes_unicos;
+       SELECT cep FROM nifi_db.ceps_unicos;
        ```
 
      - **Record Writer:**  
@@ -332,3 +332,20 @@ Agora que os **Controller Services** estão configurados, vamos configurar um pr
 4. **Objetivo do Processador:**
    - O processador irá consultar o banco de dados e retornar a lista de **CEPs** que precisam ser enriquecidos.
    - Os dados retornados serão processados e enviados como JSON utilizando o **JsonRecordSetWriter**.
+
+### **Alterar o Fluxo para Cada Saída Ser Uma Linha - Ajustando o Max Rows Per Flow File**
+
+1. **Configurar o ExecuteSQLRecord:**
+   - Selecione o **ExecuteSQLRecord** e clique em **Configure**.
+   - Vá para a aba **Properties**.
+
+2. **Ajuste a Propriedade "Max Rows Per Flow File":**  
+   - Defina o valor de **Max Rows Per Flow File** como `1`.
+
+     Isso garantirá que cada registro retornado pela query seja colocado em um **FlowFile** separado.
+
+3. **Verificar a Conexão com o Funil de Sucesso:**  
+   - Garanta que o processador **ExecuteSQLRecord** esteja conectado ao **funil de sucesso** para capturar cada linha como um FlowFile independente.
+
+4. **Testar a Alteração:**  
+   - Execute o processador e **verifique no funil de sucesso** se cada FlowFile contém exatamente um registro.
