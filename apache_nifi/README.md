@@ -107,46 +107,6 @@ docker run --name nifi -p 8443:8443 -d \
 
 # **README – Projeto de Enriquecimento de Dados com Apache NiFi**
 
----
-
-## **Índice**
-1. [O que é o Apache NiFi](#o-que-é-o-apache-nifi)  
-2. [História do Apache NiFi](#história-do-apache-nifi)  
-3. [Conectores e Integrações](#conectores-e-integrações)  
-4. [Vantagens do Apache NiFi](#vantagens-do-apache-nifi)  
-5. [Quick Start: Rodando o NiFi com Docker](#quick-start-rodando-o-nifi-com-docker)  
-6. [Projeto 01: Conectar API e Salvar Dados no MySQL](#projeto-01-conectar-api-e-salvar-dados-no-mysql)  
-7. [Criação Automática de Tabelas no Banco](#criação-automática-de-tabelas-no-banco)  
-8. [Solução de Problemas Comuns](#solução-de-problemas-comuns)
-
----
-
-## **O que é o Apache NiFi**  
-Apache NiFi é uma ferramenta de automação de fluxo de dados que permite movimentar, transformar e integrar dados entre sistemas de forma eficiente e segura.
-
----
-
-## **História do Apache NiFi**  
-Desenvolvido pela NSA e liberado pela Apache em 2014, o NiFi se tornou essencial para projetos de integração de dados em tempo real.
-
----
-
-## **Conectores e Integrações**
-- **Cloud:** AWS S3, Azure Blob Storage, Google Cloud Storage  
-- **Bancos de Dados:** MySQL, PostgreSQL, Oracle  
-- **Mensageria:** Apache Kafka, MQTT  
-- **APIs:** RESTful, FTP/SFTP
-
----
-
-## **Vantagens do Apache NiFi**
-- **Interface visual:** Simples e intuitiva  
-- **Escalável:** Pode rodar standalone ou em clusters  
-- **Rastreamento:** Proveniência completa de dados  
-- **Segurança:** SSL/TLS e autenticação LDAP
-
----
-
 ## **Quick Start: Rodando o NiFi com Docker**
 
 ### **Passo 1: Clonar o Repositório**  
@@ -221,107 +181,11 @@ Volumes são uma maneira eficiente de armazenar dados de contêineres de forma p
 3. **Fácil Manutenção:** Logs e arquivos de configuração podem ser acessados diretamente no sistema host para análise e ajustes.
 4. **Compartilhamento entre Contêineres:** Volumes permitem que múltiplos contêineres acessem os mesmos dados, como no caso de bancos de dados.
 
----
-
-### **Configuração de Rede e Acesso**
-
-O projeto usa uma rede personalizada (`nifi-network`) com **subnet 10.16.0.0/24**. Isso permite que os serviços **NiFi** e **MySQL** se comuniquem diretamente, utilizando os IPs fixos atribuídos a cada contêiner.
-
----
-
 Com essa estrutura de volumes, seu ambiente Docker está bem organizado para garantir **resiliência, persistência e rastreamento de dados**. Além disso, ao utilizar volumes nomeados e diretórios montados, você facilita o gerenciamento dos dados e a manutenção da aplicação.
 
 ### **Passo 3: Acessar a Interface NiFi**  
 Acesse o NiFi na URL:  
 [https://localhost:8443/nifi](https://localhost:8443/nifi)  
-
----
-
-version: "3.3"
-
-services: 
-  apache-nifi:
-    hostname: apache-nifi
-    image: apache/nifi:1.23.0
-    container_name: apache-nifi
-    ports:
-      - "8443:8443"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.95"
-          memory: 4G
-    restart: on-failure
-    environment:
-      - SINGLE_USER_CREDENTIALS_USERNAME=nifi
-      - SINGLE_USER_CREDENTIALS_PASSWORD=HGd15bvfv8744ghbdhgdv7895agqERAo
-      - TZ=America/Sao_Paulo
-    healthcheck:
-      test: wget -q --spider http://apache-nifi:8443/nifi-api/system-diagnostics || exit 1
-      interval: 60s
-      timeout: 40s
-      retries: 3
-    volumes: 
-      - ./nifi/jdbc:/opt/nifi/nifi-current/jdbc
-      - nifi-logs:/opt/nifi/nifi-current/logs
-      - nifi-conf:/opt/nifi/nifi-current/conf
-      - nifi-state:/opt/nifi/nifi-current/state
-      - nifi-content:/opt/nifi/nifi-current/content_repository
-      - nifi-database:/opt/nifi/nifi-current/database_repository
-      - nifi-flowfile:/opt/nifi/nifi-current/flowfile_repository
-      - nifi-provenance:/opt/nifi/nifi-current/provenance_repository
-    networks:
-      nifi-network:
-        ipv4_address: 10.16.0.2
-  mysql:
-    depends_on:
-      - apache-nifi
-    hostname: mysql
-    image: mysql:5.7.40
-    container_name: mysql
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - mysql-database:/var/lib/mysql:rw
-      - ./mysql/deploy/init:/docker-entrypoint-initdb.d
-    ports:
-      - "3306:3306"
-    deploy:
-      resources:
-        limits:
-          cpus: "0.95"
-          memory: 2G
-    restart: always
-    environment:
-      - MYSQL_ROOT_PASSWORD=d8Uwj1wos64h
-      - MYSQL_DATABASE=nifi_db
-      - TZ=America/Sao_Paulo
-    healthcheck:
-      test: mysqladmin ping -h mysql -u root -pd8Uwj1wos64h || exit 1
-      interval: 30s
-      timeout: 20s
-      retries: 5
-    networks:
-      nifi-network:
-        ipv4_address: 10.16.0.3
-
-volumes:
-  nifi-logs:
-  nifi-conf:
-  nifi-state:
-  nifi-content:
-  nifi-database:
-  nifi-flowfile:
-  nifi-provenance:
-  mysql-database:
-
-networks:
-  nifi-network:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.16.0.0/24
----
 
 ### **Montagem do Fluxo no NiFi**
 
@@ -435,139 +299,36 @@ Os **Controller Services** no Apache NiFi são componentes reutilizáveis que fo
 O uso dos **Controller Services** garante que as conexões e leituras sejam consistentes e reutilizáveis, otimizando o fluxo de dados. Cada serviço configurado centraliza uma funcionalidade importante para evitar redundâncias e facilitar a manutenção.
 
 
-2. **Adicione e configure os processadores:**
+### 4. **Iniciar a Implementação**
 
-#### **Processador: InvokeHTTP**  
-- **Descrição:** Faz requisições à API de CEP.
-- **Configuração:**  
-  - **URL:** `https://viacep.com.br/ws/${cep}/json/`
-  - **Method:** GET
-
-#### **Processador: ConvertRecord**  
-- **Descrição:** Converte JSON para um formato tabular.
-- **Configuração:**  
-  - **Record Reader:** JsonTreeReader  
-  - **Record Writer:** JsonRecordSetWriter  
-
-#### **Processador: PutDatabaseRecord**  
-- **Descrição:** Insere os dados no banco MySQL.
-- **Configuração:**  
-  - **JDBC Connection Pool:** DBCPConnectionPool  
-  - **Table Name:** `ceps_completos`
+Agora que os **Controller Services** estão configurados, vamos configurar um processador para executar nossa query SQL e capturar os dados necessários para o enriquecimento.
 
 ---
 
-## **Criação Automática de Tabelas no Banco**
+#### **Passo a Passo: Configuração do Processador ExecuteSQLRecord**
 
-### **Rotina de Inicialização**  
-Ao iniciar o projeto, as seguintes tabelas serão criadas automaticamente no MySQL:
+1. **Adicionar o Processador ExecuteSQLRecord:**
+   - Na interface do NiFi, clique com o botão direito e selecione **Add Processor**.
+   - Escolha **ExecuteSQLRecord** e arraste-o para o fluxo.
 
-#### **Tabela: ceps_unicos**  
-Armazena CEPs únicos provenientes de diferentes sistemas.
-```sql
-CREATE TABLE IF NOT EXISTS nifi_db.ceps_unicos (
-    id INT NOT NULL AUTO_INCREMENT,
-    origem VARCHAR(30),
-    cep VARCHAR(10),
-    datahora_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-);
+2. **Configuração do ExecuteSQLRecord:**
+   - Vá em **Properties** e configure os seguintes parâmetros:
+     
+     - **Database Connection Pooling Service:**  
+       `MySQL - Database` (selecionar o serviço de conexão configurado)
 
-INSERT INTO nifi_db.ceps_unicos (cep, origem)
-VALUES
-('01153000', 'Sistema A'),
-('20050000', 'Sistema B'),
-('70714020', 'Sistema C');
-```
+     - **SQL select query:**  
+       ```sql
+       SELECT cep FROM nifi_db.cepes_unicos;
+       ```
 
-#### **Tabela: ceps_completos**  
-Armazena o resultado completo do enriquecimento dos CEPs.
-```sql
-CREATE TABLE IF NOT EXISTS nifi_db.ceps_completos (
-    id INT AUTO_INCREMENT,
-    cep VARCHAR(10),
-    logradouro VARCHAR(255),
-    complemento VARCHAR(255),
-    bairro VARCHAR(255),
-    localidade VARCHAR(255),
-    uf VARCHAR(2),
-    ibge VARCHAR(10),
-    gia VARCHAR(255),
-    ddd VARCHAR(5),
-    siafi VARCHAR(10),
-    datahora_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-);
-```
+     - **Record Writer:**  
+       `JsonRecordSetWriter` (selecionar o serviço de escrita em JSON configurado)
 
----
+3. **Criar Funil para Saídas:**
+   - Adicione um **Funil (Funnel)** para capturar todas as possíveis saídas do fluxo.
+   - Isso garante que qualquer erro, sucesso ou dado processado seja mapeado corretamente.
 
-## **Configuração dos Controller Services**
-
-### **1. Configurar o DBCPConnectionPool**  
-- **Database URL:** `jdbc:mysql://localhost:3306/nifi_db`  
-- **Driver:** `com.mysql.cj.jdbc.Driver`  
-- **Username:** *seu_usuario*  
-- **Password:** *sua_senha*  
-
-### **2. Configurar Leitores e Escritores de Registros**  
-- **JsonTreeReader:** Lê os dados JSON retornados pela API.  
-- **JsonRecordSetWriter:** Prepara os dados para inserção no banco MySQL.
-
----
-
-## **Execução do Pipeline**
-
-1. **Conecte os Processors:**  
-   - **InvokeHTTP** → **ConvertRecord** → **PutDatabaseRecord**
-
-2. **Inicie o Fluxo:**  
-   Clique no botão de **play** para rodar o pipeline.
-
-3. **Verifique os Dados no MySQL:**  
-   Execute a seguinte query para verificar a inserção:
-   ```sql
-   SELECT * FROM nifi_db.ceps_completos;
-   ```
-
----
-
-## **Solução de Problemas Comuns**
-
-- **Erro de Conexão com MySQL:**  
-  Verifique se o banco está rodando e se o driver JDBC está corretamente configurado.
-
-- **Dados Não Aparecem no Banco:**  
-  Confirme se a tabela no `PutDatabaseRecord` corresponde ao nome da tabela no banco.
-
-- **Erro na API:**  
-  Teste a API manualmente para garantir que ela está disponível.
-
----
-
-## **Considerações Finais**
-
-Este projeto demonstra como integrar APIs e bancos de dados usando o Apache NiFi. A modularidade do NiFi permite expandir facilmente o pipeline para incluir novos endpoints e serviços de validação.
-
----
-
-### **Comandos Docker Úteis**
-
-- **Parar o NiFi:**  
-  ```bash
-  docker stop nifi
-  ```
-
-- **Reiniciar o NiFi:**  
-  ```bash
-  docker restart nifi
-  ```
-
-- **Verificar Logs:**  
-  ```bash
-  docker logs nifi
-  ```
-
----
-
-Com este guia, você tem todas as instruções necessárias para configurar o **NiFi**, conectar-se a uma **API**, enriquecer dados e armazená-los em um **banco MySQL**.
+4. **Objetivo do Processador:**
+   - O processador irá consultar o banco de dados e retornar a lista de **CEPs** que precisam ser enriquecidos.
+   - Os dados retornados serão processados e enviados como JSON utilizando o **JsonRecordSetWriter**.
