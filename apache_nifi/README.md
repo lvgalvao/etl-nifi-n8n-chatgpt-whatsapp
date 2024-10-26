@@ -107,6 +107,27 @@ docker run --name nifi -p 8443:8443 -d \
 
 ## **Projeto de Enriquecimento de Dados com Apache NiFi**
 
+```mermaid
+sequenceDiagram
+    participant User as Usuário
+    participant NiFi as Apache NiFi
+    participant MySQL as Banco MySQL
+    participant API as API ViaCEP
+    participant MySQLFinal as Banco Final
+
+    User->>NiFi: Inicia o processo de ETL
+    NiFi->>MySQL: Executa SQL (SELECT cep FROM ceps_unicos)
+    MySQL-->>NiFi: Retorna lista de CEPs
+    loop Para cada CEP
+        NiFi->>API: Requisita dados do CEP (GET)
+        API-->>NiFi: Retorna JSON com dados do CEP
+        NiFi->>NiFi: Transforma os dados JSON
+        NiFi->>MySQLFinal: Insere dados enriquecidos na tabela ceps_completos
+    end
+    MySQLFinal-->>NiFi: Confirma inserção
+    NiFi-->>User: Notifica conclusão do processo
+```
+
 **Passo 1: Clonar o Repositório**  
 Clone o repositório do projeto:
 ```bash
