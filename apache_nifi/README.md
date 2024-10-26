@@ -349,3 +349,47 @@ Agora que os **Controller Services** estão configurados, vamos configurar um pr
 
 4. **Testar a Alteração:**  
    - Execute o processador e **verifique no funil de sucesso** se cada FlowFile contém exatamente um registro.
+
+### 5. **Mapeamento do JSON**
+
+Nesta etapa, utilizaremos o processador **EvaluateJsonPath** para extrair informações específicas do JSON e mapeá-las como atributos do FlowFile. Isso permitirá que os dados sejam manipulados de forma mais granular no próximo estágio do fluxo.
+
+---
+
+#### **Passo a Passo: Configuração do EvaluateJsonPath**
+
+1. **Adicionar o Processador EvaluateJsonPath:**
+   - Na interface do NiFi, clique com o botão direito e selecione **Add Processor**.
+   - Escolha **EvaluateJsonPath** e arraste-o para o fluxo.
+
+2. **Conectar à Saída de Sucesso:**  
+   - Conecte a **saída de sucesso** do processador **ExecuteSQLRecord** ao **EvaluateJsonPath**.  
+   - Isso garante que apenas os registros válidos sejam processados.
+
+3. **Configuração do EvaluateJsonPath:**
+   - Vá em **Properties** e adicione a seguinte propriedade:
+
+     - **Property Name:** `cod_cep`  
+     - **JsonPath Expression:** `$. [0].cep`  
+     - **Destination:** `FlowFile-attribute`  
+     - **Return Type:** `json`
+
+---
+
+#### **Adicionar Funil de Saída (Match):**
+
+1. **Criar Funil:**  
+   - Adicione um novo **Funil (Funnel)** para capturar as saídas que correspondem ao mapeamento correto (match).
+
+2. **Conectar o EvaluateJsonPath:**  
+   - Conecte a **saída de match** do **EvaluateJsonPath** ao **funil**.
+
+---
+
+#### **Testar a Configuração:**
+
+1. **Executar o Fluxo:**  
+   - Execute o processador **EvaluateJsonPath** e verifique se o atributo **cod_cep** foi adicionado corretamente aos FlowFiles.
+
+2. **Verificar a Saída:**  
+   - Cada FlowFile agora terá o valor do CEP mapeado como um atributo, facilitando o uso posterior em outros processadores ou etapas do fluxo.
