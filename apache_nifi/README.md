@@ -487,9 +487,3 @@ Agora vamos adicionar o processador **PutDatabaseRecord** para inserir os dados 
    
 2. **Monitoramento:**  
    - Com um agendamento bem definido, você pode evitar gargalos e garantir que as novas inserções sejam processadas de forma eficiente e sem sobrecarga no banco de dados.
-
----
-
-### **Resumo**
-
-Com o **PutDatabaseRecord**, os dados enriquecidos serão inseridos diretamente na tabela **ceps_completos**. Limpar as filas antes do teste garante que não haja resíduos de dados antigos. O agendamento correto do primeiro processador mantém o fluxo fluindo de maneira eficiente e controlada, evitando sobrecarga no sistema e garantindo a integridade dos dados.
