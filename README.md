@@ -1,5 +1,7 @@
 # Workshop ETL Usando Python, AI, N8N e API WhatsApp
 
+[Link Excalidraw](https://link.excalidraw.com/l/8pvW6zbNUnD/7ih9njnfD2k) 
+
 ## Descrição do Workshop
 Uma capacitação completa de 9 horas, ao vivo, onde você aprenderá a criar uma **pipeline avançada** para extração, transformação e integração de dados. Você terá a oportunidade de trabalhar com **Python, N8N, Inteligência Artificial e a API do WhatsApp** para desenvolver soluções reais e escaláveis.
 
