@@ -412,7 +412,7 @@ Nesta etapa, vamos configurar um processador **InvokeHTTP** para chamar a API do
      - **HTTP Method:** `GET`
      - **HTTP URL:**  
        ``` 
-       viacep.com.br/ws/${cod_cep}/json/ 
+       https://viacep.com.br/ws/${cod_cep}/json/ 
        ```  
      - Isso garantirá que cada CEP capturado será enviado como parâmetro na URL da API.
 
@@ -435,3 +435,61 @@ Vamos consultar a nova tabela no MySQL para garantir que os dados estejam comple
 SELECT * 
 FROM nifi_db.ceps_completos;
 ```
+
+### 7. **Gravando com PutDatabaseRecord**
+
+Agora vamos adicionar o processador **PutDatabaseRecord** para inserir os dados enriquecidos na tabela **`ceps_completos`** no MySQL.
+
+---
+
+#### **Passo a Passo: Configuração do Processador PutDatabaseRecord**
+
+1. **Adicionar o Processador PutDatabaseRecord:**
+   - Na interface do NiFi, clique com o botão direito e selecione **Add Processor**.
+   - Escolha **PutDatabaseRecord** e arraste-o para o fluxo.
+
+2. **Configurar as Properties:**
+   - **Record Reader:**  
+     Selecione `JsonTreeReader` (configurado anteriormente).
+   - **Database Connection Pooling Service:**  
+     Selecione `MySQL - Database`.
+   - **Table Name:**  
+     `ceps_completos`
+   - **Insert Statement:**  
+     O processo será usado para **inserir** os dados enriquecidos na tabela.
+   
+3. **Conectar Saídas:**
+   - **Success:** Conecte ao funil ou ao próximo passo do fluxo.
+   - **Failure:** Conecte ao funil de erros para capturar falhas durante a inserção.
+
+4. **Testar Conexão:**  
+   - Vá até as **Properties** e clique em **Test Connection** para garantir que o processador está corretamente configurado e pode se conectar ao banco de dados.
+
+---
+
+### 8. **Testando Todo o Fluxo**
+
+1. **Limpar Todas as Filas:**  
+   - Antes de ativar, vá até cada funil e fila do fluxo e limpe os dados acumulados para evitar sobrecarga ou resultados antigos.
+
+2. **Ativar Todo o Fluxo:**  
+   - Selecione todos os processadores e clique em **Start** para ativá-los simultaneamente.
+
+---
+
+### **Sobre o Schedule do Primeiro Ponto**
+
+1. **Agendamento do Processador Inicial:**
+   - No NiFi, o **ExecuteSQLRecord** ou o primeiro processador precisa ter um **schedule** adequado para não sobrecarregar o fluxo.
+   - **Recomendações:**
+     - Defina o **Run Schedule** para que o processador execute a cada X minutos ou horas, conforme o volume de dados.
+     - Use um **Timer Driven Scheduling** caso queira rodar periodicamente, ou **Event-Driven** se o fluxo depender de eventos específicos.
+   
+2. **Monitoramento:**  
+   - Com um agendamento bem definido, você pode evitar gargalos e garantir que as novas inserções sejam processadas de forma eficiente e sem sobrecarga no banco de dados.
+
+---
+
+### **Resumo**
+
+Com o **PutDatabaseRecord**, os dados enriquecidos serão inseridos diretamente na tabela **ceps_completos**. Limpar as filas antes do teste garante que não haja resíduos de dados antigos. O agendamento correto do primeiro processador mantém o fluxo fluindo de maneira eficiente e controlada, evitando sobrecarga no sistema e garantindo a integridade dos dados.
