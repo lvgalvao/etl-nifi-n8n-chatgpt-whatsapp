@@ -276,6 +276,19 @@ Os **Processor Groups** são unidades lógicas que organizam e agrupam processad
 ### **Conclusão:**
 Processor Groups ajudam a organizar e gerenciar pipelines, melhorando a clareza e facilitando a manutenção.
 
+## **Controller Services no Apache NiFi**
+
+Os **Controller Services** são complementos dos **Processors** no NiFi. Eles fornecem configurações e funcionalidades reutilizáveis que podem ser compartilhadas por vários processadores, garantindo **consistência** e **eficiência** em todo o fluxo.
+
+---
+
+### **Função dos Controller Services**
+
+- **Configuração Reutilizável:** Serviços como conexões com bancos de dados, leitores de arquivos, ou clientes HTTP podem ser configurados uma vez e reutilizados por múltiplos processadores.
+- **Complemento do Processor:** Enquanto o **Processor** realiza a tarefa específica (como uma query SQL ou chamada HTTP), o **Controller Service** fornece os recursos necessários para essa tarefa (como uma pool de conexões de banco de dados).
+- **Facilidade de Manutenção:** Alterações no serviço são propagadas automaticamente para todos os processadores que o utilizam.
+
+
 ## **Projeto de Enriquecimento de Dados com Apache NiFi**
 
 ```mermaid
