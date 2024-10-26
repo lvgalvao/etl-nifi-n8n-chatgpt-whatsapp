@@ -105,100 +105,34 @@ docker run --name nifi -p 8443:8443 -d \
   docker exec -it nifi /bin/bash
   ```
 
-# **README – Projeto de Enriquecimento de Dados com Apache NiFi**
+## **Projeto de Enriquecimento de Dados com Apache NiFi**
 
-## **Quick Start: Rodando o NiFi com Docker**
-
-### **Passo 1: Clonar o Repositório**  
+**Passo 1: Clonar o Repositório**  
 Clone o repositório do projeto:
 ```bash
 git clone https://github.com/Renatoelho/apache-nifi-enriquecimento-cep.git apache-nifi-enriquecimento-cep
 cd apache-nifi-enriquecimento-cep/
 ```
 
-### **Passo 2: Rodar com Docker Compose**
+**Passo 2: Rodar com Docker Compose**
 Execute o seguinte comando para iniciar o NiFi e o MySQL:
 ```bash
 docker compose -p project-apache-nifi-enriq-cep -f docker-compose.yaml up -d
 ```
 
-#### ** Nosso arquivo docker compose **
-
-## **Comentário sobre os Volumes no `docker-compose`**
-
-Volumes são uma maneira eficiente de armazenar dados de contêineres de forma persistente, garantindo que as informações não sejam perdidas caso o contêiner seja reiniciado ou removido. A seguir, detalhamos os volumes utilizados para o **Apache NiFi** e **MySQL** no seu `docker-compose.yaml`.
-
----
-
-### **Volumes Criados para o Apache NiFi**
-
-1. **`nifi-logs:/opt/nifi/nifi-current/logs`**  
-   - **Descrição:** Armazena todos os logs gerados pela aplicação NiFi.  
-   - **Importância:** Permite a auditoria e o monitoramento de erros, além de análises posteriores sobre o desempenho do sistema.
-
-2. **`nifi-conf:/opt/nifi/nifi-current/conf`**  
-   - **Descrição:** Contém os arquivos de configuração do NiFi.  
-   - **Importância:** Garante que todas as configurações personalizadas sejam preservadas entre reinicializações do contêiner.
-
-3. **`nifi-state:/opt/nifi/nifi-current/state`**  
-   - **Descrição:** Armazena informações sobre o estado dos processadores e fluxos do NiFi.  
-   - **Importância:** Mantém o estado dos processadores para garantir a continuidade dos fluxos após falhas ou reinícios.
-
-4. **`nifi-content:/opt/nifi/nifi-current/content_repository`**  
-   - **Descrição:** Repositório para armazenar temporariamente os dados em trânsito pelos fluxos do NiFi.  
-   - **Importância:** Otimiza o desempenho, armazenando conteúdo enquanto os dados são processados e transferidos entre processadores.
-
-5. **`nifi-database:/opt/nifi/nifi-current/database_repository`**  
-   - **Descrição:** Repositório que contém informações sobre o repositório de banco de dados do NiFi.  
-   - **Importância:** Garante a persistência dos dados internos do NiFi que não devem ser perdidos entre reinicializações.
-
-6. **`nifi-flowfile:/opt/nifi/nifi-current/flowfile_repository`**  
-   - **Descrição:** Armazena informações sobre os **FlowFiles** (unidades de dados em trânsito).  
-   - **Importância:** Essencial para a recuperação e rastreamento de dados em caso de falhas durante o processamento.
-
-7. **`nifi-provenance:/opt/nifi/nifi-current/provenance_repository`**  
-   - **Descrição:** Mantém o histórico de proveniência de todos os dados processados pelo NiFi.  
-   - **Importância:** Facilita auditorias e rastreamento de dados, garantindo conformidade e transparência sobre como os dados foram manipulados.
-
----
-
-### **Volumes Criados para o MySQL**
-
-1. **`mysql-database:/var/lib/mysql:rw`**  
-   - **Descrição:** Armazena todos os dados do banco de dados MySQL.  
-   - **Importância:** Garante a persistência dos dados do banco, mesmo que o contêiner seja reiniciado ou removido.
-
-2. **`./mysql/deploy/init:/docker-entrypoint-initdb.d`**  
-   - **Descrição:** Diretório local contendo scripts de inicialização do banco.  
-   - **Importância:** Permite a execução de scripts SQL ao iniciar o contêiner, como a criação de tabelas ou inserções iniciais.
-
----
-
-### **Por que Utilizar Volumes?**
-
-1. **Persistência de Dados:** Volumes garantem que os dados e configurações do sistema não sejam perdidos entre reinicializações e atualizações de contêineres.
-2. **Separação de Dados e Aplicação:** Permite que dados críticos fiquem fora do ciclo de vida dos contêineres, facilitando backups e migrações.
-3. **Fácil Manutenção:** Logs e arquivos de configuração podem ser acessados diretamente no sistema host para análise e ajustes.
-4. **Compartilhamento entre Contêineres:** Volumes permitem que múltiplos contêineres acessem os mesmos dados, como no caso de bancos de dados.
-
-Com essa estrutura de volumes, seu ambiente Docker está bem organizado para garantir **resiliência, persistência e rastreamento de dados**. Além disso, ao utilizar volumes nomeados e diretórios montados, você facilita o gerenciamento dos dados e a manutenção da aplicação.
-
-### **Passo 3: Acessar a Interface NiFi**  
+**Passo 3: Acessar a Interface NiFi**  
 Acesse o NiFi na URL:  
 [https://localhost:8443/nifi](https://localhost:8443/nifi)  
 
-### **Montagem do Fluxo no NiFi**
+**Montagem do Fluxo no NiFi**
 
-1. **Abra a interface do NiFi.**
-2. **Vamos criar o Flow**
+### 1. **Abra a interface do NiFi.**
 
 ### 2. **Vamos criar o Flow: Add Process Group**
 
 #### **Passo 1: Add Process Group**
 - Clique com o botão direito na interface do NiFi e selecione **"Add Process Group"**.  
 - **Nomeie:** *Enriquecimento de CEPs*.
-
----
 
 #### **Por que separar por Process Groups?**
 
@@ -217,13 +151,9 @@ Acesse o NiFi na URL:
 5. **Ambientes Separados:**  
    - Grupos podem ser facilmente replicados entre desenvolvimento, homologação e produção.
 
----
-
 ### 3. **Vamos criar os nossos Controller Services**
 
 Os **Controller Services** no Apache NiFi são componentes reutilizáveis que fornecem funcionalidades comuns para vários processadores em um fluxo. Eles garantem **consistência**, **reutilização** e **facilidade de manutenção**, otimizando tarefas como leitura de dados, conexão com bancos e escrita de registros. A seguir, faremos a configuração de três serviços essenciais.
-
----
 
 #### **Passo a Passo: Criando os Controller Services**
 
@@ -236,9 +166,9 @@ Os **Controller Services** no Apache NiFi são componentes reutilizáveis que fo
 
 ---
 
-### **Lista de Controller Services e Configurações**
+#### **Lista de Controller Services e Configurações**
 
-#### 1. **JsonTreeReader**
+##### 1. **JsonTreeReader**
    - **O que faz:**  
      Lê dados em formato JSON para serem utilizados pelos processadores.
    - **Passo:**  
@@ -246,7 +176,7 @@ Os **Controller Services** no Apache NiFi são componentes reutilizáveis que fo
 
 ---
 
-#### 2. **JsonRecordSetWriter**
+##### 2. **JsonRecordSetWriter**
    - **O que faz:**  
      Escreve dados processados em formato JSON, gerando a saída do fluxo.  
    - **Passo:**  
@@ -254,7 +184,7 @@ Os **Controller Services** no Apache NiFi são componentes reutilizáveis que fo
 
 ---
 
-#### **3. DBCPConnectionPool (MySQL - Database)**  
+##### **3. DBCPConnectionPool (MySQL - Database)**  
 - **Descrição:** Gerencia a conexão com o banco de dados MySQL, otimizando a comunicação e o desempenho.  
 
 ---
@@ -291,13 +221,6 @@ Os **Controller Services** no Apache NiFi são componentes reutilizáveis que fo
 
 1. Após configurar todos os serviços, clique em **Enable** para ativá-los.
 2. Verifique se todos estão ativos e sem erros na aba **Controller Services**.
-
----
-
-### **Resumo**
-
-O uso dos **Controller Services** garante que as conexões e leituras sejam consistentes e reutilizáveis, otimizando o fluxo de dados. Cada serviço configurado centraliza uma funcionalidade importante para evitar redundâncias e facilitar a manutenção.
-
 
 ### 4. **Iniciar a Implementação**
 
