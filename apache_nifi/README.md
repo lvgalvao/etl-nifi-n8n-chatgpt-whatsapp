@@ -105,6 +105,92 @@ docker run --name nifi -p 8443:8443 -d \
   docker exec -it nifi /bin/bash
   ```
 
+## Hello World
+
+### **Exemplo de Processo com FlowFile no Apache NiFi**
+
+Vamos criar um processo simples utilizando o **GenerateFlowFile** para gerar arquivos de 10KB com conteúdo personalizado, simulando dados da **Jornada de Dados**. Esse exemplo demonstra como configurar o processador e como cada configuração impacta o fluxo.
+
+---
+
+### **GenerateFlowFile**: Visão Geral
+
+O **GenerateFlowFile** é um processador que cria FlowFiles com conteúdo gerado dinamicamente. Ele é útil para testes e simulações em pipelines de dados.
+
+---
+
+### **Configurações Importantes do GenerateFlowFile**
+
+1. **Settings (Configurações Gerais):**
+   - Define o **comportamento geral** do processador, como nome, penalidade em caso de falha e estado de ativação.
+   - **Run Duration:** Tempo que o processador deve permanecer ativo.
+   - **Concurrent Tasks:** Define o número de threads paralelas que o processador pode executar.
+
+2. **Scheduling (Agendamento):**
+   - Controla **quando e com que frequência** o processador será executado.
+     - **Run Schedule:** Determina o intervalo entre execuções. Exemplo: a cada 5 segundos.
+     - **Execution:** Pode ser **Timer Driven** (baseado em tempo) ou **Event Driven** (acionado por eventos).
+     - **Scheduling Strategy:** Define se o processador rodará por tempo fixo ou volume de dados.
+
+3. **Properties (Propriedades):**
+   - Define **comportamentos específicos** para o processador.
+     - **File Size:** Define o tamanho dos arquivos. Exemplo: `10 KB`.
+     - **Custom Text:** Conteúdo personalizado a ser incluído no FlowFile. Exemplo: `"Bem-vindo à Jornada de Dados!"`
+     - **Batch Size:** Quantidade de arquivos gerados por execução.
+
+4. **Comments (Comentários):**
+   - Campo livre para adicionar **notas explicativas** sobre o uso ou propósito do processador.
+
+---
+
+### **Exemplo de Configuração do GenerateFlowFile**
+
+1. **Settings:**
+   - **Name:** `Geração de Arquivo - Jornada de Dados`
+   - **Penalidade:** `30s` (Tempo de espera após falha)
+   - **Concurrent Tasks:** 1
+
+2. **Scheduling:**
+   - **Run Schedule:** A cada 10 segundos.
+   - **Execution:** Timer Driven (baseado em tempo).
+
+3. **Properties:**
+   - **File Size:** `10 KB`
+   - **Custom Text:** `"Bem-vindo à Jornada de Dados!"`
+   - **Batch Size:** `1` (Um arquivo por execução)
+
+4. **Comments:**
+   - **Comentário:**  
+     “Este processo gera arquivos de 10KB com uma mensagem personalizada da Jornada de Dados para testes e validação.”
+
+---
+
+### **Fluxo de Exemplo com GenerateFlowFile**
+
+```mermaid
+flowchart LR
+    Generate[GenerateFlowFile] --> Success[Funnel - Captura de Saída]
+    Success --> Store[PutFile - Salvar em Diretório]
+```
+
+1. **GenerateFlowFile**: Gera um arquivo de 10KB a cada 10 segundos com o texto "Bem-vindo à Jornada de Dados!".
+2. **Funnel (Funil)**: Coleta a saída do processador.
+3. **PutFile**: Salva os arquivos gerados em um diretório local.
+
+---
+
+### **Como o Processo Funciona**
+
+1. O **GenerateFlowFile** cria um arquivo com 10KB e o texto especificado.
+2. Cada arquivo gerado é enviado ao **Funnel**, que direciona a saída para o próximo passo do fluxo.
+3. O **PutFile** grava o arquivo gerado em um diretório no sistema local.
+
+---
+
+### **Conclusão**
+
+Este exemplo simples demonstra como configurar e utilizar o **GenerateFlowFile** para criar arquivos personalizados, mostrando a flexibilidade do Apache NiFi. Através das configurações de **Settings, Scheduling, Properties e Comments**, você pode controlar a geração de arquivos para atender às necessidades de teste e automação da **Jornada de Dados**.
+
 ## **Projeto de Enriquecimento de Dados com Apache NiFi**
 
 ```mermaid
