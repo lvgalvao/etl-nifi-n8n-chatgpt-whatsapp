@@ -1,13 +1,4 @@
-# **Apache NiFi - Docker Setup (Quick Start)**
-
-## **Índice**
-1. [O que é o Apache NiFi](#o-que-é-o-apache-nifi)  
-2. [História do Apache NiFi](#história-do-apache-nifi)  
-3. [Conectores e Integrações](#conectores-e-integrações)  
-4. [Vantagens do Apache NiFi](#vantagens-do-apache-nifi)  
-5. [Empresas que utilizam o Apache NiFi](#empresas-que-utilizam-o-apache-nifi)  
-6. [Quick Start: Como rodar o Apache NiFi](#quick-start-como-rodar-o-apache-nifi)  
-7. [Comandos Docker úteis](#comandos-docker-úteis)  
+# **Apache NiFi**
 
 ---
 
@@ -109,6 +100,18 @@ docker run --name nifi -p 8443:8443 -d \
 
 Vamos criar um processo simples no **NiFi** utilizando o **GenerateFlowFile** para gerar arquivos de 10KB com conteúdo personalizado, simulando dados da **Jornada de Dados**. Além disso, usaremos o **PutFile** para salvar esses arquivos em um diretório local no host, configurando corretamente o volume no **Docker**.
 
+### **Fluxo de Exemplo com GenerateFlowFile e PutFile**
+
+```mermaid
+flowchart LR
+    Generate[GenerateFlowFile] --> Funnel[Funnel - Captura de Saída]
+    Funnel --> PutFile[PutFile - Salvar no Diretório /data]
+```
+
+1. **GenerateFlowFile**: Gera arquivos de 10KB a cada 10 segundos com o texto "Bem-vindo à Jornada de Dados!".
+2. **Funnel**: Direciona a saída para o **PutFile**.
+3. **PutFile**: Salva os arquivos gerados no diretório `/data`, que corresponde ao diretório `Temp` no host.
+
 ---
 
 ### **Executando o Apache NiFi com Docker e Volume Mapeado**
@@ -163,20 +166,6 @@ docker run --name nifi -p 8443:8443 -v C:/Temp/nifi-data:/data -d apache/nifi:la
 
 ---
 
-### **Fluxo de Exemplo com GenerateFlowFile e PutFile**
-
-```mermaid
-flowchart LR
-    Generate[GenerateFlowFile] --> Funnel[Funnel - Captura de Saída]
-    Funnel --> PutFile[PutFile - Salvar no Diretório /data]
-```
-
-1. **GenerateFlowFile**: Gera arquivos de 10KB a cada 10 segundos com o texto "Bem-vindo à Jornada de Dados!".
-2. **Funnel**: Direciona a saída para o **PutFile**.
-3. **PutFile**: Salva os arquivos gerados no diretório `/data`, que corresponde ao diretório `Temp` no host.
-
----
-
 ### **Como o Processo Funciona**
 
 1. O **GenerateFlowFile** cria arquivos de 10KB com a mensagem personalizada da Jornada de Dados.
@@ -188,6 +177,103 @@ flowchart LR
 ### **Conclusão**
 
 Este exemplo mostra como criar e configurar um fluxo simples no **Apache NiFi**, utilizando **GenerateFlowFile** e **PutFile** para gerar e salvar arquivos com conteúdo personalizado. O uso de volumes no **Docker** permite que os arquivos criados no container fiquem acessíveis no host, facilitando testes e validações.
+
+## Connectors
+
+### **Configurações do Connector no Apache NiFi**
+
+Aqui está uma explicação detalhada de cada configuração disponível ao configurar um **Connector** entre processadores no Apache NiFi. O Connector garante o fluxo controlado dos **FlowFiles** entre processadores, permitindo que você personalize o comportamento do fluxo de acordo com as necessidades do seu projeto.
+
+---
+
+### **Configurações do Connector: Parâmetros Explicados**
+
+1. **Name (Nome):**  
+   - Nome para o Connector que ajuda a identificá-lo facilmente na interface.
+   - **Exemplo:** `Connector - Generate to PutFile`.
+
+2. **ID:**  
+   - Identificador único gerado automaticamente pelo NiFi. 
+   - Usado internamente para rastreamento e referência.
+
+   **Exemplo:** `c7b6a26d-0192-1000-b113-dbba3647b2a3`
+
+3. **FlowFile Expiration (Expiração do FlowFile):**  
+   - Define o tempo máximo que um FlowFile pode permanecer na fila antes de ser descartado.
+   - **Padrão:** `0 sec` (Sem expiração).
+   - **Quando usar:** Se quiser evitar que dados antigos se acumulem.
+
+4. **Back Pressure (Pressão Reversa):**  
+   - Controla quando o fluxo de dados deve ser pausado para evitar sobrecarga.
+
+   - **Object Threshold (Limite de Objetos):**  
+     - O número máximo de FlowFiles permitidos na fila antes de ativar o back pressure.
+     - **Padrão:** `10.000` FlowFiles.
+
+   - **Size Threshold (Limite de Tamanho):**  
+     - O tamanho máximo de dados permitidos na fila.
+     - **Padrão:** `1 GB`.
+
+5. **Load Balance Strategy (Estratégia de Balanceamento de Carga):**  
+   - Define como os FlowFiles serão distribuídos, especialmente útil em ambientes de **cluster**.
+
+   **Opções:**
+   - **Do not load balance:** (Padrão) Não há balanceamento de carga.
+   - **Round Robin:** Distribui FlowFiles de forma alternada entre conexões ou nós.
+   - **Single Node:** Todos os FlowFiles são enviados para um nó específico.
+   - **FlowFile Attribute:** O balanceamento é feito com base em um atributo do FlowFile.
+
+6. **Available Prioritizers (Priorizadores Disponíveis):**  
+   - Determina a **ordem de processamento** dos FlowFiles na fila.
+
+   **Opções:**
+   - **FirstInFirstOutPrioritizer (FIFO):** Processa na ordem de chegada.
+   - **NewestFlowFileFirstPrioritizer:** Prioriza os FlowFiles mais recentes.
+   - **OldestFlowFileFirstPrioritizer:** Prioriza os FlowFiles mais antigos.
+   - **PriorityAttributePrioritizer:** Usa um atributo específico do FlowFile para priorização.
+
+7. **Selected Prioritizers (Priorizadores Selecionados):**  
+   - Aqui você escolhe quais priorizadores serão aplicados à fila do Connector.
+   - **Exemplo:** Selecione **FIFO** para manter a ordem de chegada dos FlowFiles.
+
+---
+
+### **Alterando o Connector para Controlar o Envio a Cada 10 Segundos**
+
+Embora o **tempo de execução** seja configurado no **processador GenerateFlowFile**, você pode controlar o fluxo no **Connector** ajustando o **Back Pressure** e o agendamento para liberar apenas **um FlowFile a cada 10 segundos**.
+
+#### **Passo a Passo: Alterando o Connector**
+
+1. **Configuração no Connector:**
+   - **Object Threshold:** `1`  
+     (Permite apenas 1 FlowFile por vez na fila).
+   - **Size Threshold:** `10 KB`  
+     (Define o tamanho máximo para evitar sobrecarga).
+
+2. **Configuração do GenerateFlowFile:**
+   - **Run Schedule:** `10 sec`  
+     (A cada 10 segundos, o processador gera um FlowFile).
+   - **Execution:** `Timer Driven`.
+
+---
+
+### **Fluxo Ajustado: GenerateFlowFile → PutFile**
+
+```mermaid
+flowchart LR
+    Generate[GenerateFlowFile] --> Connector((Connector: 1 FlowFile / 10 KB)) --> PutFile[PutFile]
+```
+
+1. **GenerateFlowFile:** Gera um FlowFile com conteúdo personalizado a cada **10 segundos**.
+2. **Connector:**  
+   - Permite **1 FlowFile** na fila por vez e aplica **back pressure** ao atingir o limite.
+3. **PutFile:** Salva o FlowFile gerado no diretório `/data`.
+
+---
+
+### **Conclusão**
+
+Com essa configuração, o **Connector** limita o fluxo para que apenas **um FlowFile** seja processado a cada 10 segundos, controlando a frequência de processamento. O ajuste do **back pressure** garante que o fluxo se mantenha estável, enquanto o uso de **FIFO** como priorizador mantém a ordem de chegada dos arquivos.
 
 ## **Projeto de Enriquecimento de Dados com Apache NiFi**
 
