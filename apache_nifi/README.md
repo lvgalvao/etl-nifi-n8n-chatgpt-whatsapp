@@ -122,7 +122,7 @@ docker run --name nifi -p 8443:8443 -v C:/Temp/nifi-data:/data -d apache/nifi:la
 ```
 
 - **`-p 8443:8443`**: Expondo a interface do NiFi.
-- **`-v C:/Temp/nifi-data:/data`**: Mapeia o diretório local `nifi-data` para o diretório `/data` no container. Todos os arquivos gerados pelo **PutFile** serão salvos em `nifi-data` no host.
+- **`-v C:/Temp/nifi-data:/data`**: Mapeia o diretório local para o diretório `/data` no container. Todos os arquivos gerados pelo **PutFile** serão salvos em `Temp` no host.
 - **`-d`**: Executa o container em modo **daemon** (segundo plano).
 
 ---
@@ -173,17 +173,7 @@ flowchart LR
 
 1. **GenerateFlowFile**: Gera arquivos de 10KB a cada 10 segundos com o texto "Bem-vindo à Jornada de Dados!".
 2. **Funnel**: Direciona a saída para o **PutFile**.
-3. **PutFile**: Salva os arquivos gerados no diretório `/data`, que corresponde ao diretório `nifi-data` no host.
-
----
-
-### **Verificando os Arquivos no Host**
-
-Após o fluxo ser executado, você pode verificar os arquivos gerados no diretório local:
-
-```bash
-ls nifi-data
-```
+3. **PutFile**: Salva os arquivos gerados no diretório `/data`, que corresponde ao diretório `Temp` no host.
 
 ---
 
