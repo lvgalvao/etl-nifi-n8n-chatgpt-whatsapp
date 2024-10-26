@@ -393,3 +393,45 @@ Nesta etapa, utilizaremos o processador **EvaluateJsonPath** para extrair inform
 
 2. **Verificar a Saída:**  
    - Cada FlowFile agora terá o valor do CEP mapeado como um atributo, facilitando o uso posterior em outros processadores ou etapas do fluxo.
+
+### 6. **Configurando Nossa API**
+
+Nesta etapa, vamos configurar um processador **InvokeHTTP** para chamar a API do **ViaCEP**, utilizando o código do CEP mapeado no passo anterior. A resposta será usada para completar os dados na nossa nova tabela no MySQL.
+
+---
+
+#### **Passo a Passo: Configuração do Processador InvokeHTTP**
+
+1. **Adicionar o Processador InvokeHTTP:**
+   - Na interface do NiFi, clique com o botão direito e selecione **Add Processor**.
+   - Escolha **InvokeHTTP** e arraste-o para o fluxo.
+
+2. **Configuração do InvokeHTTP:**
+   - Vá em **Properties** e configure os seguintes parâmetros:
+
+     - **HTTP Method:** `GET`
+     - **HTTP URL:**  
+       ``` 
+       viacep.com.br/ws/${cod_cep}/json/ 
+       ```  
+     - Isso garantirá que cada CEP capturado será enviado como parâmetro na URL da API.
+
+3. **Conectar Saídas:**
+   - **Success:** Conecte a saída de sucesso do **InvokeHTTP** ao próximo processador que irá tratar a resposta JSON.
+   - **Failure:** Adicione um **funil** para capturar **todos os erros** e conecte a saída **failure** do **InvokeHTTP** a ele.
+   - **No Response:** Conecte essa relação também ao **funil de erro** para gerenciar cenários em que a API não responde.
+
+4. **Relacionamento da Saída "Original":**
+   - Conecte a saída **original** do **InvokeHTTP** a um funil separado. 
+   - Isso garante que a entrada original seja preservada para auditoria ou reprocessamento, caso necessário.
+
+---
+
+#### **Verificar a Tabela Destino**
+
+Vamos consultar a nova tabela no MySQL para garantir que os dados estejam completos após a execução do fluxo.
+
+```sql
+SELECT * 
+FROM nifi_db.ceps_completos;
+```
