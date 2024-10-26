@@ -62,6 +62,29 @@ O foco será a **engenharia de dados aplicada à integração de múltiplas font
 - Construir pipelines de automação com **Python, N8N e ChatGPT**
 - Realizar automações via **WhatsApp**, explorando casos de uso para trading financeiro e análise de mercado.
 
+### **Matriz Comparativa: Apache NiFi, Airbyte e N8N**
+
+| **Critério**                | **Apache NiFi**                                       | **Airbyte**                                      | **N8N**                                          |
+|-----------------------------|-------------------------------------------------------|-------------------------------------------------|-------------------------------------------------|
+| **Facilidade de uso**        | **Contra**: Curva de aprendizado alta devido à complexidade de configuração. | **A favor**: Interface intuitiva, mais fácil de configurar para pipelines simples. | **A favor**: Interface visual com arraste e solta, ideal para iniciantes. |
+| **Escalabilidade**           | **A favor**: Altamente escalável, suporta grandes volumes de dados. | **A favor**: Escalável para pipelines de ingestão de dados em lote. | **Contra**: Menos eficiente para grandes volumes de dados e processos complexos. |
+| **Integrações**              | **A favor**: Suporta várias integrações nativas, especialmente para sistemas complexos e IoT. | **A favor**: Focado em integração com bancos de dados e APIs populares. | **A favor**: Grande quantidade de integrações prontas com plataformas e serviços SaaS. |
+| **Manutenção e Operação**    | **Contra**: Requer equipe especializada para manutenção contínua. | **A favor**: Foco em simplicidade e facilidade de manutenção. | **A favor**: Simples de operar, com manutenção mínima. |
+| **Tempo de Desenvolvimento** | **Contra**: Tempo elevado para configurar pipelines complexos. | **A favor**: Desenvolvimento rápido de pipelines com conectores prontos. | **A favor**: Configuração rápida de automações com baixa necessidade de código. |
+| **Custo**                   | **Contra**: Pode ser caro devido à necessidade de infraestrutura robusta. | **A favor**: Open-source com planos pagos apenas para funcionalidades avançadas. | **A favor**: Open-source com modelo freemium e baixo custo inicial. |
+| **Comunidade e Suporte**     | **A favor**: Comunidade ativa e documentação extensa. | **A favor**: Comunidade crescente com suporte ativo. | **A favor**: Comunidade ativa e documentação clara, além de muitos tutoriais. |
+| **Orquestração de Workflows** | **A favor**: Ideal para workflows complexos e de longa duração. | **Contra**: Menos flexível para orquestrar workflows complexos. | **A favor**: Excelente para automações e workflows simples e médios. |
+| **Uso em Tempo Real**        | **A favor**: Otimizado para processamento de dados em tempo real e fluxo contínuo. | **Contra**: Melhor para ingestão em lote do que em tempo real. | **Contra**: Suporta tempo real, mas não é otimizado para grandes fluxos contínuos. |
+
+---
+
+### **Resumo**:
+- **Apache NiFi**: Ideal para projetos complexos e de grande escala, mas exige maior expertise técnica. Indicado para casos que envolvem **fluxos de dados contínuos** e **integração com sistemas diversos**.  
+- **Airbyte**: Focado em **ingestão de dados estruturados** e **fácil integração com bancos e APIs**, sendo uma solução simples e eficiente para casos de **pipelines em lote**.  
+- **N8N**: Perfeito para **automação de processos** e **integrações rápidas**. Embora não seja ideal para grandes volumes de dados, destaca-se pela facilidade de uso e **rápido desenvolvimento** de fluxos.
+
+Essa matriz pode ajudar na escolha da ferramenta com base nas necessidades específicas do projeto, considerando o equilíbrio entre **facilidade de uso, escalabilidade e custo**.
+
 ## Tecnologias Utilizadas
 - **Python**: Extração e manipulação de dados  
 - **N8N**: Automação e orquestração de workflows  
