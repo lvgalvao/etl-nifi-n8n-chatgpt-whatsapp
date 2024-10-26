@@ -238,9 +238,7 @@ Aqui está uma explicação detalhada de cada configuração disponível ao conf
 
 ---
 
-### **Alterando o Connector para Controlar o Envio a Cada 10 Segundos**
-
-Embora o **tempo de execução** seja configurado no **processador GenerateFlowFile**, você pode controlar o fluxo no **Connector** ajustando o **Back Pressure** e o agendamento para liberar apenas **um FlowFile a cada 10 segundos**.
+### **Alterando o Connector para Apagar Fila a cada 10 Segundos**
 
 #### **Passo a Passo: Alterando o Connector**
 
@@ -249,11 +247,6 @@ Embora o **tempo de execução** seja configurado no **processador GenerateFlowF
      (Permite apenas 1 FlowFile por vez na fila).
    - **Size Threshold:** `10 KB`  
      (Define o tamanho máximo para evitar sobrecarga).
-
-2. **Configuração do GenerateFlowFile:**
-   - **Run Schedule:** `10 sec`  
-     (A cada 10 segundos, o processador gera um FlowFile).
-   - **Execution:** `Timer Driven`.
 
 ---
 
@@ -264,16 +257,24 @@ flowchart LR
     Generate[GenerateFlowFile] --> Connector((Connector: 1 FlowFile / 10 KB)) --> PutFile[PutFile]
 ```
 
-1. **GenerateFlowFile:** Gera um FlowFile com conteúdo personalizado a cada **10 segundos**.
-2. **Connector:**  
-   - Permite **1 FlowFile** na fila por vez e aplica **back pressure** ao atingir o limite.
-3. **PutFile:** Salva o FlowFile gerado no diretório `/data`.
-
 ---
 
 ### **Conclusão**
 
 Com essa configuração, o **Connector** limita o fluxo para que apenas **um FlowFile** seja processado a cada 10 segundos, controlando a frequência de processamento. O ajuste do **back pressure** garante que o fluxo se mantenha estável, enquanto o uso de **FIFO** como priorizador mantém a ordem de chegada dos arquivos.
+
+## **Processor Groups no Apache NiFi**
+
+Os **Processor Groups** são unidades lógicas que organizam e agrupam processadores no NiFi, facilitando a criação de fluxos modulares e gerenciáveis. 
+
+### **Vantagens:**
+- **Modularidade:** Divide fluxos complexos em partes menores.
+- **Reutilização:** Pode ser duplicado ou exportado.
+- **Permissões:** Controla quem pode acessar ou modificar cada grupo.
+- **Comunicação:** Usa **Input** e **Output Ports** para conectar grupos entre si.
+
+### **Conclusão:**
+Processor Groups ajudam a organizar e gerenciar pipelines, melhorando a clareza e facilitando a manutenção.
 
 ## **Projeto de Enriquecimento de Dados com Apache NiFi**
 
