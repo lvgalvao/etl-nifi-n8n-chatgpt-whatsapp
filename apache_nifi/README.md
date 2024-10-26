@@ -118,14 +118,11 @@ Para que o **PutFile** salve os arquivos no sistema local, configuraremos um vol
 #### **Comando Docker com Volume:**
 
 ```bash
-docker run --name nifi \
-  -p 8443:8443 \
-  -v $(pwd)/nifi-data:/data \
-  -d apache/nifi:latest
+docker run --name nifi -p 8443:8443 -v C:/Temp/nifi-data:/data -d apache/nifi:latest
 ```
 
 - **`-p 8443:8443`**: Expondo a interface do NiFi.
-- **`-v $(pwd)/nifi-data:/data`**: Mapeia o diretório local `nifi-data` para o diretório `/data` no container. Todos os arquivos gerados pelo **PutFile** serão salvos em `nifi-data` no host.
+- **`-v C:/Temp/nifi-data:/data`**: Mapeia o diretório local `nifi-data` para o diretório `/data` no container. Todos os arquivos gerados pelo **PutFile** serão salvos em `nifi-data` no host.
 - **`-d`**: Executa o container em modo **daemon** (segundo plano).
 
 ---
